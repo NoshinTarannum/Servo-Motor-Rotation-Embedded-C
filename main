@@ -1,0 +1,43 @@
+#include <mega32.h>
+#include <delay.h>
+int i = 0;
+ 
+interrupt [EXT_INT0] void ext_int0_isr(void)
+{
+	OCR1A = 2000;
+	for (i = 0; i < 100; i++)
+    	{
+    	OCR1A = OCR1A + 40;
+    	delay_ms(10);
+    	}
+}
+ 
+interrupt [EXT_INT1] void ext_int1_isr(void)
+{
+	OCR1A = 6000;
+	for (i = 0; i < 100; i++)
+    	{
+    	OCR1A = OCR1A - 40;
+    	delay_ms(10);
+    	}
+}
+ 
+ 
+void main(void)
+{
+	DDRD.5 = 1;
+	TCCR1A = (1 << COM1A1) | (0 << COM1A0) | (0 << COM1B1) | (0 << COM1B0) | (1 << WGM11) | (0 << WGM10);
+	TCCR1B = (0 << ICNC1) | (0 << ICES1) | (1 << WGM13) | (1 << WGM12) | (0 << CS12) | (1 << CS11) | (0 << CS10);
+	ICR1H = 0xC3;
+	ICR1L = 0x50;
+ 
+	GICR |= (1 << INT1) | (1 << INT0) | (0 << INT2);
+	MCUCR = (1 << ISC11) | (0 << ISC10) | (1 << ISC01) | (0 << ISC00);
+ 
+#asm("sei")
+ 
+	while (1)
+    	{
+ 
+    	}
+}
